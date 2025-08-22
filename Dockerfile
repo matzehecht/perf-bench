@@ -1,6 +1,6 @@
 FROM node
 
-RUN mkdir -p /app && chown -R node:node /app
+RUN mkdir -p /app
 WORKDIR /app
 
 RUN apt-get update
@@ -40,7 +40,5 @@ RUN npm install -g @lhci/cli
 
 COPY perf-bench.sh /usr/local/bin/perf-bench
 RUN chmod +x /usr/local/bin/perf-bench
-
-USER node
 
 ENTRYPOINT ["/usr/local/bin/perf-bench"]
