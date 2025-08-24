@@ -78,16 +78,16 @@ fi
 echo "Debug: Remaining arguments (should be URLs): $@"
 
 run_lighthouse() {
-  rm -rf .lighthouseci .lighthouseci
+  rm -rf .lighthouseci .output
 
   local url=$1
-  lhci autorun --upload.target=filesystem --upload.outputDir='.lighthouseci/' --collect.url=$url --collect.numberOfRuns=$LIGHTHOUSE_RUNS --collect.settings.chromeFlags="--no-sandbox --disable-gpu" > /dev/null 2>&1
+  lhci autorun --upload.target=filesystem --upload.outputDir='.output/' --collect.url=$url --collect.numberOfRuns=$LIGHTHOUSE_RUNS --collect.settings.chromeFlags="--no-sandbox --disable-gpu" > /dev/null 2>&1
 
   # Auswertung aus den JSON-Ergebnissen (Performance Score)
-  PERF_SCORE=$(jq -r '.[].summary.performance' .lighthouseci/manifest.json)
-  ACCESS_SCORE=$(jq -r '.[].summary.accessibility' .lighthouseci/manifest.json)
-  BP_SCORE=$(jq -r '.[].summary["best-practices"]' .lighthouseci/manifest.json)
-  SEO_SCORE=$(jq -r '.[].summary.seo' .lighthouseci/manifest.json)
+  PERF_SCORE=$(jq -r '[.[].summary.performance] | add/length' .output/manifest.json)
+  ACCESS_SCORE=$(jq -r '[.[].summary.accessibility] | add/length' .output/manifest.json)
+  BP_SCORE=$(jq -r '[.[].summary["best-practices"]] | add/length' .output/manifest.json)
+  SEO_SCORE=$(jq -r '[.[].summary.seo] | add/length' .output/manifest.json)
 
   echo "$PERF_SCORE" "$ACCESS_SCORE" "$BP_SCORE" "$SEO_SCORE"
 }
