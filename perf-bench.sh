@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir -p logs
+
 # Default values
 LIGHTHOUSE_RUNS=5
 AB_REQUESTS=200
@@ -79,9 +81,10 @@ echo "Debug: Remaining arguments (should be URLs): $@"
 
 run_lighthouse() {
   rm -rf .lighthouseci .output
+  mkdir -p .lighthouseci .output
 
   local url=$1
-  lhci autorun --upload.target=filesystem --upload.outputDir='.output/' --collect.url=$url --collect.numberOfRuns=$LIGHTHOUSE_RUNS --collect.settings.chromeFlags="--no-sandbox --disable-gpu" > /dev/null 2>&1
+  lhci autorun --upload.target=filesystem --upload.outputDir='.output/' --collect.url=$url --collect.numberOfRuns=$LIGHTHOUSE_RUNS --collect.settings.chromeFlags="--no-sandbox --disable-gpu" > "./logs/$(date +%Y%m%d_%H%M%S).log" 2>"./logs/$(date +%Y%m%d_%H%M%S).error.log"
 
   # Auswertung aus den JSON-Ergebnissen (Performance Score)
   PERF_SCORE=$(jq -r '[.[].summary.performance] | add/length' .output/manifest.json)
